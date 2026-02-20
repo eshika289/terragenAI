@@ -60,7 +60,7 @@ def test_chat_round_trip(monkeypatch):
         {"role": "user", "content": "hello"},
         {"role": "assistant", "content": "hi there"},
     ]
-    assert any("LLM CLI started" in str(line) for line in output)
+    assert any("TerragenAI Chat started" in str(line) for line in output)
 
 
 def test_configure_uses_default_when_input_blank(monkeypatch):

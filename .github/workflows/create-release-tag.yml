@@ -15,10 +15,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Create next patch tag
         run: |
           set -euo pipefail
+
+          if [ -z "${{ secrets.RELEASE_PAT }}" ]; then
+            echo "Missing RELEASE_PAT secret. Add a PAT with repository contents write access."
+            exit 1
+          fi
 
           if git tag --points-at HEAD | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "A version tag already exists on this commit."
@@ -35,6 +41,7 @@ jobs:
             NEXT_TAG="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
           fi
 
+          git remote set-url origin "https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/${{ github.repository }}.git"
           git tag "${NEXT_TAG}"
           git push origin "${NEXT_TAG}"
           echo "Created ${NEXT_TAG}"

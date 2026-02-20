@@ -9,7 +9,7 @@ from .memory import add_message, load_history
 
 def chat() -> None:
     history = load_history()
-    print("[bold green]LLM CLI started. Type 'exit' to quit.[/bold green]")
+    print("[bold green]TerragenAI Chat started. Type 'exit' to quit.[/bold green]")
 
     while True:
         user_input = input("\nYou: ")

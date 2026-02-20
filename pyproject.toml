@@ -18,6 +18,12 @@ dependencies = [
   "requests>=2.31.0"
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=5.0.0"
+]
+
 [project.urls]
 Homepage = "https://github.com/eshika289/terragenAI"
 Repository = "https://github.com/eshika289/terragenAI"

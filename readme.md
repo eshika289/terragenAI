@@ -1,4 +1,4 @@
-# terragenai 
+# terragenai  
 
 A generative AI CLI tool that builds terraform configurations using Terraform Enterprise or Cloud private registry modules.
 

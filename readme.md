@@ -1,4 +1,4 @@
-# terragenai
+# terragenai 
 
 A minimal standalone CLI package inside this repository.
 

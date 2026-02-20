@@ -2,11 +2,11 @@ name: Publish to PyPI
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -26,3 +26,25 @@ jobs:
           python -m build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Create next patch tag
+        run: |
+          set -euo pipefail
+
+          if git tag --points-at HEAD | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "A version tag already exists on this commit."
+            exit 0
+          fi
+
+          LAST_TAG="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)"
+          if [ -z "${LAST_TAG}" ]; then
+            NEXT_TAG="v0.0.1"
+          else
+            VERSION="${LAST_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "${VERSION}"
+            NEXT_PATCH=$((PATCH + 1))
+            NEXT_TAG="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
+          fi
+
+          git tag "${NEXT_TAG}"
+          git push origin "${NEXT_TAG}"
+          echo "Created ${NEXT_TAG}"

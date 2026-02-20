@@ -12,18 +12,6 @@ python3 -m src.main --configure
 
 `--configure` saves settings to your OS-specific user config directory.
 
-## File Locations
-
-- macOS:
-  - Config: `~/Library/Application Support/TerragenAI/.terragenairc`
-  - History: `~/Library/Application Support/TerragenAI/history.json`
-- Windows:
-  - Config: `%APPDATA%\\TerragenAI\\.terragenairc`
-  - History: `%LOCALAPPDATA%\\TerragenAI\\history.json`
-- Linux:
-  - Config: `$XDG_CONFIG_HOME/terragenai/.terragenairc` (or `~/.config/terragenai/.terragenairc`)
-  - History: `$XDG_STATE_HOME/terragenai/history.json` (or `~/.local/state/terragenai/history.json`)
-
 Overrides:
 - `TERRAGENAI_HOME` to place both files in a single custom directory.
 - `TERRAGENAI_CONFIG_FILE` to set an exact config file path.

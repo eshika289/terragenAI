@@ -3,3 +3,5 @@ __pycache__
 dist
 .DS_Store
 terragenai.egg-info/
+.coverage
+htmlcov

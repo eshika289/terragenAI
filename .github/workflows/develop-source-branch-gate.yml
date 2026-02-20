@@ -1,0 +1,24 @@
+name: Develop Source Branch Gate
+
+on:
+  pull_request:
+    branches: [develop]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+jobs:
+  only-feature-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR is not from feature/*
+        run: |
+          case "${{ github.head_ref }}" in
+            feature/*) echo "Allowed source branch: ${{ github.head_ref }}" ;;
+            *)
+              echo "Only PRs from 'feature/*' can merge into 'develop'. Current source: '${{ github.head_ref }}'"
+              exit 1
+              ;;
+          esac

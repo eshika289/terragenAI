@@ -2,19 +2,12 @@
 
 A generative AI CLI tool that builds terraform configurations using Terraform Enterprise or Cloud private registry modules.
 
-## How to Install
-
-```bash
-pip install terragenai
-terragenai
-```
-
 ## Common Flags
 
 ```bash
 terragenai --help
-terragenai -m src.main --version
-terragenai -m src.main --configure
+terragenai --version
+terragenai --configure
 ```
 
 `--configure` saves settings to your OS-specific user config directory.
@@ -27,7 +20,7 @@ Overrides:
 ## Usage
 ```
 % terragenai
-LLM CLI started. Type 'exit' to quit.
+TerragenAI Chat started. Type 'exit' to quit.
 
 You: create 2 ec2 instances in us-west-2
 Thinking...

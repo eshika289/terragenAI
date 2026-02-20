@@ -1,5 +1,8 @@
 __pycache__
+.pytest_cache
 .venv
 dist
 .DS_Store
 terragenai.egg-info/
+.coverage
+htmlcov

@@ -75,5 +75,10 @@ def test_configure_uses_default_when_input_blank(monkeypatch):
 
     main.configure()
 
-    assert saved == {"api_url": "http://localhost:8000/chat"}
+    assert saved == {
+        "TF_ORG": "",
+        "TF_REGISTRY_DOMAIN": "app.terraform.io",
+        "TF_API_TOKEN": "",
+        "GIT_CLONE_TOKEN": "",
+    }
     assert any("Saved configuration" in str(line) for line in output)

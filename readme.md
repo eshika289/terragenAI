@@ -11,6 +11,7 @@ terragenai --configure
 ```
 
 `--configure` saves settings to your OS-specific user config directory.
+It prompts for Terraform-related settings (`TF_ORG`, `TF_REGISTRY_DOMAIN`, `TF_API_TOKEN`, `GIT_CLONE_TOKEN`).
 
 Overrides:
 - `TERRAGENAI_HOME` to place both files in a single custom directory.

@@ -52,7 +52,6 @@ python -m src.main
 
 Optional environment variables:
 
-- `TERRAGENAI_API_URL` (override backend URL)
 - `TERRAGENAI_CONFIG_FILE` (override config file location)
 - `TERRAGENAI_HISTORY_FILE` (override chat history file location)
 - `TERRAGENAI_HOME` (override app config/state base directory)

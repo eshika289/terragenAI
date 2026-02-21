@@ -55,6 +55,11 @@ def test_chat_round_trip(monkeypatch):
     output = []
 
     monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
+    monkeypatch.setattr(
+        main,
+        "get_registry_service",
+        lambda: type("S", (), {"validate_catalog": lambda self: True})(),
+    )
     monkeypatch.setattr(main, "load_history", lambda: history_store)
     monkeypatch.setattr(main, "send_message", lambda _history: "hi there")
     monkeypatch.setattr(

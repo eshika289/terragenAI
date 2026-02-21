@@ -48,6 +48,9 @@ tag_regex = "^v(?P<version>\\d+\\.\\d+\\.\\d+)$"
 [tool.black]
 line-length = 88
 target-version = ["py39"]
+extend-exclude = '''
+^/src/_version\.py$
+'''
 
 [tool.ruff]
 line-length = 88

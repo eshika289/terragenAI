@@ -37,7 +37,9 @@ def test_get_state_dir_uses_xdg_state_on_posix(monkeypatch):
 def test_get_config_dir_uses_appdata_on_windows(monkeypatch):
     monkeypatch.delenv("TERRAGENAI_HOME", raising=False)
     monkeypatch.setattr(paths.sys, "platform", "win32")
-    fake_os = SimpleNamespace(name="nt", getenv=lambda key: {"APPDATA": "/tmp/appdata"}.get(key))
+    fake_os = SimpleNamespace(
+        name="nt", getenv=lambda key: {"APPDATA": "/tmp/appdata"}.get(key)
+    )
     monkeypatch.setattr(paths, "os", fake_os)
 
     assert paths.get_config_dir() == Path("/tmp/appdata/.terragenai")
@@ -46,7 +48,9 @@ def test_get_config_dir_uses_appdata_on_windows(monkeypatch):
 def test_get_state_dir_uses_localappdata_on_windows(monkeypatch):
     monkeypatch.delenv("TERRAGENAI_HOME", raising=False)
     monkeypatch.setattr(paths.sys, "platform", "win32")
-    fake_os = SimpleNamespace(name="nt", getenv=lambda key: {"LOCALAPPDATA": "/tmp/localappdata"}.get(key))
+    fake_os = SimpleNamespace(
+        name="nt", getenv=lambda key: {"LOCALAPPDATA": "/tmp/localappdata"}.get(key)
+    )
     monkeypatch.setattr(paths, "os", fake_os)
 
     assert paths.get_state_dir() == Path("/tmp/localappdata/.terragenai")
@@ -55,7 +59,9 @@ def test_get_state_dir_uses_localappdata_on_windows(monkeypatch):
 def test_get_config_dir_darwin(monkeypatch):
     monkeypatch.delenv("TERRAGENAI_HOME", raising=False)
     monkeypatch.setattr(paths.sys, "platform", "darwin")
-    monkeypatch.setattr(paths.Path, "home", classmethod(lambda _cls: Path("/Users/test")))
+    monkeypatch.setattr(
+        paths.Path, "home", classmethod(lambda _cls: Path("/Users/test"))
+    )
 
     assert paths.get_config_dir() == Path("/Users/test/.terragenai")
 
@@ -63,9 +69,13 @@ def test_get_config_dir_darwin(monkeypatch):
 def test_get_state_dir_darwin(monkeypatch):
     monkeypatch.delenv("TERRAGENAI_HOME", raising=False)
     monkeypatch.setattr(paths.sys, "platform", "darwin")
-    monkeypatch.setattr(paths.Path, "home", classmethod(lambda _cls: Path("/Users/test")))
+    monkeypatch.setattr(
+        paths.Path, "home", classmethod(lambda _cls: Path("/Users/test"))
+    )
 
-    assert paths.get_state_dir() == Path("/Users/test/Library/Application Support/.terragenai")
+    assert paths.get_state_dir() == Path(
+        "/Users/test/Library/Application Support/.terragenai"
+    )
 
 
 def test_ensure_dir_creates_directory(tmp_path):

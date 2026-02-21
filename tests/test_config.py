@@ -16,7 +16,7 @@ def test_save_and_load_config_roundtrip(tmp_path, monkeypatch):
     config_file = tmp_path / ".terragenairc"
     monkeypatch.setenv("TERRAGENAI_CONFIG_FILE", str(config_file))
 
-    expected = {"api_url": "http://localhost:8000/chat"}
+    expected = {"TF_ORG": "my-org", "TF_REGISTRY_DOMAIN": "app.terraform.io"}
     save_config(expected)
 
     assert load_config() == expected

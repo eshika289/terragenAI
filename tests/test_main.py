@@ -16,7 +16,9 @@ def test_build_parser_has_expected_flags():
 def test_run_starts_chat_when_no_args(monkeypatch):
     monkeypatch.setattr(main.sys, "argv", ["terragenai"])
     called = {"chat": 0}
-    monkeypatch.setattr(main, "chat", lambda: called.__setitem__("chat", called["chat"] + 1))
+    monkeypatch.setattr(
+        main, "chat", lambda: called.__setitem__("chat", called["chat"] + 1)
+    )
 
     main.run()
 
@@ -36,7 +38,11 @@ def test_run_version_flag_prints_version(monkeypatch):
 def test_run_configure_flag_calls_configure(monkeypatch):
     monkeypatch.setattr(main.sys, "argv", ["terragenai", "--configure"])
     called = {"configure": 0}
-    monkeypatch.setattr(main, "configure", lambda: called.__setitem__("configure", called["configure"] + 1))
+    monkeypatch.setattr(
+        main,
+        "configure",
+        lambda: called.__setitem__("configure", called["configure"] + 1),
+    )
 
     main.run()
 
@@ -49,9 +55,20 @@ def test_chat_round_trip(monkeypatch):
     output = []
 
     monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
+    monkeypatch.setattr(
+        main,
+        "get_registry_service",
+        lambda: type("S", (), {"validate_catalog": lambda self: True})(),
+    )
     monkeypatch.setattr(main, "load_history", lambda: history_store)
     monkeypatch.setattr(main, "send_message", lambda _history: "hi there")
-    monkeypatch.setattr(main, "add_message", lambda history, role, content: history.append({"role": role, "content": content}))
+    monkeypatch.setattr(
+        main,
+        "add_message",
+        lambda history, role, content: history.append(
+            {"role": role, "content": content}
+        ),
+    )
     monkeypatch.setattr(main, "print", lambda value: output.append(value))
 
     main.chat()
@@ -75,5 +92,10 @@ def test_configure_uses_default_when_input_blank(monkeypatch):
 
     main.configure()
 
-    assert saved == {"api_url": "http://localhost:8000/chat"}
+    assert saved == {
+        "TF_ORG": "",
+        "TF_REGISTRY_DOMAIN": "app.terraform.io",
+        "TF_API_TOKEN": "",
+        "GIT_CLONE_TOKEN": "",
+    }
     assert any("Saved configuration" in str(line) for line in output)

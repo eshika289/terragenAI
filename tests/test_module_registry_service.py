@@ -9,7 +9,9 @@ class FakeRegistry:
     TF_API_TOKEN = "token-123"
     GIT_CLONE_TOKEN = ""
     TF_HEADERS = {"Authorization": "Bearer token-123"}
-    TF_REGISTRY_MODULES_URL = "https://app.terraform.io/api/v2/organizations/my-org/registry-modules"
+    TF_REGISTRY_MODULES_URL = (
+        "https://app.terraform.io/api/v2/organizations/my-org/registry-modules"
+    )
 
 
 def _build_service(tmp_path, monkeypatch):
@@ -99,7 +101,9 @@ def test_build_catalog_writes_modules_json(tmp_path, monkeypatch):
                     "name": "vpc",
                     "namespace": "my-org",
                     "provider": "aws",
-                    "vcs-repo": {"repository-http-url": "https://github.com/example/vpc.git"},
+                    "vcs-repo": {
+                        "repository-http-url": "https://github.com/example/vpc.git"
+                    },
                     "version-statuses": [{"version": "1.0.0"}],
                 }
             }
@@ -107,7 +111,9 @@ def test_build_catalog_writes_modules_json(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(service, "_git_clone_repo", lambda _repo_url: None)
     monkeypatch.setattr(service, "_git_checkout_tag", lambda _tag: None)
-    monkeypatch.setattr(service, "_parse_tf_variables", lambda: [{"name": "region", "required": True}])
+    monkeypatch.setattr(
+        service, "_parse_tf_variables", lambda: [{"name": "region", "required": True}]
+    )
     monkeypatch.setattr(service, "_list_repo_files", lambda: ["main.tf"])
     monkeypatch.setattr(base.shutil, "rmtree", lambda _path: None)
 

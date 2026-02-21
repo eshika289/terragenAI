@@ -1,16 +1,18 @@
-import os
 import json
+import os
 import shutil
 import subprocess
-import requests
-import hcl2
-from typing import Dict, List
 from pathlib import Path
+from typing import Dict, List
+
+import hcl2
+import requests
 
 from ...models.module_registry import ModuleRegistry
 from ...paths import get_config_dir
 
 # TODO: Refactor
+
 
 class ModuleRegistryService:
     def __init__(self):
@@ -175,7 +177,7 @@ class ModuleRegistryService:
 
         print(f"\n✅ Catalog written to {self.catalog_path}")
         print(f"📊 Total repos indexed: {len(catalog)}")
-    
+
     # ------------------------------
     # Validate Catalog Exists
     # ------------------------------

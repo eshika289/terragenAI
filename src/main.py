@@ -1,20 +1,23 @@
 import argparse
 import sys
+
 from rich import print
 
 from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
 from .memory import add_message, load_history
-
 from .services.registry.base import ModuleRegistryService
+
 
 def chat() -> None:
     registry_service = get_registry_service()
     if not registry_service.validate_catalog():
-        print(f"[bold red]Registry module catalog not found. Run terragenai --sync first.[/bold red]")
+        print(
+            "[bold red]Registry module catalog not found. Run terragenai --sync first.[/bold red]"
+        )
         return
-        
+
     history = load_history()
     print("[bold green]TerragenAI Chat started. Type 'exit' to quit.[/bold green]")
 
@@ -32,7 +35,9 @@ def chat() -> None:
 
 def configure() -> None:
     current = load_config()
-    tf_org = input(f"Enter TF_ORG [{current.get('TF_ORG', '')}]: ").strip() or current.get("TF_ORG", "")
+    tf_org = input(
+        f"Enter TF_ORG [{current.get('TF_ORG', '')}]: "
+    ).strip() or current.get("TF_ORG", "")
     tf_registry_domain = (
         input(
             "Enter TF_REGISTRY_DOMAIN "
@@ -41,14 +46,12 @@ def configure() -> None:
         or current.get("TF_REGISTRY_DOMAIN")
         or "app.terraform.io"
     )
-    tf_api_token = (
-        input(f"Enter TF_API_TOKEN [{current.get('TF_API_TOKEN', '')}]: ").strip()
-        or current.get("TF_API_TOKEN", "")
-    )
-    git_clone_token = (
-        input(f"Enter GIT_CLONE_TOKEN [{current.get('GIT_CLONE_TOKEN', '')}]: ").strip()
-        or current.get("GIT_CLONE_TOKEN", "")
-    )
+    tf_api_token = input(
+        f"Enter TF_API_TOKEN [{current.get('TF_API_TOKEN', '')}]: "
+    ).strip() or current.get("TF_API_TOKEN", "")
+    git_clone_token = input(
+        f"Enter GIT_CLONE_TOKEN [{current.get('GIT_CLONE_TOKEN', '')}]: "
+    ).strip() or current.get("GIT_CLONE_TOKEN", "")
     config = {
         "TF_ORG": tf_org,
         "TF_REGISTRY_DOMAIN": tf_registry_domain,
@@ -65,27 +68,39 @@ def configure() -> None:
 
 
 registry_service = None
+
+
 def get_registry_service():
     global registry_service
     if registry_service is None:
         registry_service = ModuleRegistryService()
     return registry_service
 
+
 def sync_registry_modules():
     registry_service = get_registry_service()
     registry_service.build_catalog()
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="terragenai",
         description="Simple Terragen AI chat CLI.",
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Show version and exit.")
-    parser.add_argument("--configure", action="store_true", help="Configure CLI settings.")
-    parser.add_argument("--sync", "--sync-registry-modules", dest="sync_registry_modules", action="store_true", help="Sync the latest modules from your Terraform Cloud/Enterprise private registry.")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Show version and exit."
+    )
+    parser.add_argument(
+        "--configure", action="store_true", help="Configure CLI settings."
+    )
+    parser.add_argument(
+        "--sync",
+        "--sync-registry-modules",
+        dest="sync_registry_modules",
+        action="store_true",
+        help="Sync the latest modules from your Terraform Cloud/Enterprise private registry.",
+    )
     return parser
-
-
 
 
 def run() -> None:
@@ -102,11 +117,10 @@ def run() -> None:
     if args.configure:
         configure()
         return
-    
+
     if args.sync_registry_modules:
         sync_registry_modules()
         return
-
 
     chat()
 

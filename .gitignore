@@ -6,3 +6,4 @@ dist
 terragenai.egg-info/
 .coverage
 htmlcov
+.ruff_cache

@@ -1,7 +1,7 @@
 import json
 import subprocess
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 import requests
@@ -30,6 +30,7 @@ def _build_service(tmp_path, monkeypatch):
 # _normalize_tag
 # ------------------------------
 
+
 def test_normalize_tag_adds_v_prefix(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     assert service._normalize_tag("1.2.3") == "v1.2.3"
@@ -50,6 +51,7 @@ def test_normalize_tag_returns_none_for_falsy(tmp_path, monkeypatch):
 # ------------------------------
 # _clone_url
 # ------------------------------
+
 
 def test_clone_url_no_token_unchanged(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -84,6 +86,7 @@ def test_clone_url_injects_token_http(tmp_path, monkeypatch):
 # ------------------------------
 # _http_get
 # ------------------------------
+
 
 def test_http_get_returns_json_on_success(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -129,6 +132,7 @@ def test_http_get_succeeds_after_retry(tmp_path, monkeypatch):
 # _list_registry_modules
 # ------------------------------
 
+
 def test_list_registry_modules_single_page(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     monkeypatch.setattr(
@@ -155,6 +159,7 @@ def test_list_registry_modules_empty_response(tmp_path, monkeypatch):
 # _build_catalog_entry
 # ------------------------------
 
+
 def test_build_catalog_entry_structure(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     entry = service._build_catalog_entry(
@@ -179,6 +184,7 @@ def test_build_catalog_entry_structure(tmp_path, monkeypatch):
 # ------------------------------
 # _write_catalog / validate_catalog
 # ------------------------------
+
 
 def test_write_catalog_creates_file(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -218,6 +224,7 @@ def test_validate_catalog_returns_false_when_missing(tmp_path, monkeypatch):
 # _list_repo_files
 # ------------------------------
 
+
 def test_list_repo_files_excludes_git_dir(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
 
@@ -244,6 +251,7 @@ def test_list_repo_files_empty_repo(tmp_path, monkeypatch):
 # ------------------------------
 # _parse_tf_variables
 # ------------------------------
+
 
 def test_parse_tf_variables_basic(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -322,6 +330,7 @@ def test_parse_tf_variables_ignores_non_tf_files(tmp_path, monkeypatch):
 # ------------------------------
 # build_catalog edge cases
 # ------------------------------
+
 
 def _mock_build_catalog_service(tmp_path, monkeypatch, modules):
     service = _build_service(tmp_path, monkeypatch)

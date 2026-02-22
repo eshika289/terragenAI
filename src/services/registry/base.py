@@ -63,7 +63,9 @@ class ModuleRegistryService:
         last_error: Optional[requests.RequestException] = None
         for _ in range(3):
             try:
-                resp = self.session.get(url, headers=self.registry.TF_HEADERS, timeout=30)
+                resp = self.session.get(
+                    url, headers=self.registry.TF_HEADERS, timeout=30
+                )
                 resp.raise_for_status()
                 return resp.json()
             except requests.RequestException as exc:
@@ -103,7 +105,9 @@ class ModuleRegistryService:
         )
 
     def _git_checkout_tag(self, repo_dir: Path, tag: str):
-        subprocess.run(["git", "checkout", "--quiet", tag], cwd=str(repo_dir), check=True)
+        subprocess.run(
+            ["git", "checkout", "--quiet", tag], cwd=str(repo_dir), check=True
+        )
 
     # ------------------------------
     # Terraform parsing
@@ -216,7 +220,10 @@ class ModuleRegistryService:
             versions = attrs.get("version-statuses", [])
 
             if not name or not namespace or not provider:
-                print(f"WARNING: Skipping module with incomplete metadata: {attrs}", file=sys.stderr)
+                print(
+                    f"WARNING: Skipping module with incomplete metadata: {attrs}",
+                    file=sys.stderr,
+                )
                 continue
 
             if not vcs:
@@ -225,7 +232,10 @@ class ModuleRegistryService:
 
             repo_url = vcs.get("repository-http-url")
             if not repo_url:
-                print(f"WARNING: Skipping {name}: missing repository-http-url", file=sys.stderr)
+                print(
+                    f"WARNING: Skipping {name}: missing repository-http-url",
+                    file=sys.stderr,
+                )
                 continue
 
             print(f"Processing {namespace}/{name}/{provider}")
@@ -245,13 +255,19 @@ class ModuleRegistryService:
                 for version in versions:
                     tag = self._normalize_tag(version.get("version"))
                     if not tag:
-                        print(f"WARNING: Skipping invalid version for {name}: {version}", file=sys.stderr)
+                        print(
+                            f"WARNING: Skipping invalid version for {name}: {version}",
+                            file=sys.stderr,
+                        )
                         continue
 
                     try:
                         self._git_checkout_tag(clone_dir, tag)
                     except subprocess.CalledProcessError:
-                        print(f"WARNING: Tag {tag} not found for {repo_url}, skipping", file=sys.stderr)
+                        print(
+                            f"WARNING: Tag {tag} not found for {repo_url}, skipping",
+                            file=sys.stderr,
+                        )
                         continue
 
                     variables = self._parse_tf_variables(clone_dir)

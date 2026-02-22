@@ -3,7 +3,9 @@ from unittest.mock import MagicMock
 from src import client
 
 
-def _mock_vector_store(retrieved_modules='[]', reply="```hcl\nresource \"aws_instance\" \"example\" {}\n```"):
+def _mock_vector_store(
+    retrieved_modules="[]", reply='```hcl\nresource "aws_instance" "example" {}\n```'
+):
     vector_store = MagicMock()
     vector_store.retrieve_modules.return_value = retrieved_modules
     vector_store.llm.generate.return_value = reply
@@ -13,6 +15,7 @@ def _mock_vector_store(retrieved_modules='[]', reply="```hcl\nresource \"aws_ins
 # ------------------------------
 # send_message
 # ------------------------------
+
 
 def test_send_message_returns_llm_reply():
     vector_store = _mock_vector_store(reply="some terraform code")

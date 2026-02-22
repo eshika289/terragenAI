@@ -33,6 +33,7 @@ FULL_MODULE = {
 # Abstract interface
 # ------------------------------
 
+
 def test_cannot_instantiate_abstract_class():
     with pytest.raises(TypeError):
         VectorStoreService()
@@ -59,6 +60,7 @@ def test_concrete_subclass_missing_retrieve_modules_raises():
 # ------------------------------
 # module_to_embedding_text
 # ------------------------------
+
 
 def test_module_to_embedding_text_contains_all_fields(service):
     text = service.module_to_embedding_text(FULL_MODULE)
@@ -111,6 +113,7 @@ def test_module_to_embedding_text_variables_as_json(service):
 # modules_to_string
 # ------------------------------
 
+
 def test_modules_to_string_returns_valid_json(service):
     result = service.modules_to_string([FULL_MODULE])
     parsed = json.loads(result)
@@ -156,7 +159,11 @@ def test_modules_to_string_empty_list(service):
 
 
 def test_modules_to_string_multiple_modules(service):
-    second = {**FULL_MODULE, "source": "app.terraform.io/my-org/eks/aws", "module_name": "eks"}
+    second = {
+        **FULL_MODULE,
+        "source": "app.terraform.io/my-org/eks/aws",
+        "module_name": "eks",
+    }
     result = service.modules_to_string([FULL_MODULE, second])
     parsed = json.loads(result)
     assert len(parsed) == 2

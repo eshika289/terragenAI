@@ -1,14 +1,8 @@
 import json
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import faiss
-import numpy as np
-import pytest
-
 from src.services.vector_store.faiss_store import FaissService
-
 
 MOCK_EMBEDDING = [0.1] * 1536
 
@@ -63,6 +57,7 @@ def _build_service(tmp_path, monkeypatch, modules=_SENTINEL):
 # __init__
 # ------------------------------
 
+
 def test_init_creates_directories(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     assert Path(service.vector_dir).exists()
@@ -94,6 +89,7 @@ def test_init_empty_modules_inventory(tmp_path, monkeypatch):
 # create_index
 # ------------------------------
 
+
 def test_create_index_builds_faiss_index(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     service.create_index()
@@ -122,7 +118,7 @@ def test_create_index_calls_embedding_per_module(tmp_path, monkeypatch):
 def test_create_index_skips_rebuild_when_index_exists(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     service.create_index()
-    call_count_after_first = service.llm.create_embedding.call_count
+    service.llm.create_embedding.call_count
 
     service.llm.create_embedding.reset_mock()
     service.create_index()
@@ -162,13 +158,18 @@ def test_create_index_no_modules_does_not_create_index(tmp_path, monkeypatch):
 # retrieve_modules
 # ------------------------------
 
-def test_retrieve_modules_returns_empty_when_index_not_initialised(tmp_path, monkeypatch):
+
+def test_retrieve_modules_returns_empty_when_index_not_initialised(
+    tmp_path, monkeypatch
+):
     service = _build_service(tmp_path, monkeypatch)
     result = service.retrieve_modules("create a vpc")
     assert result == []
 
 
-def test_retrieve_modules_returns_empty_when_module_texts_missing(tmp_path, monkeypatch):
+def test_retrieve_modules_returns_empty_when_module_texts_missing(
+    tmp_path, monkeypatch
+):
     service = _build_service(tmp_path, monkeypatch)
     service.faiss_index = MagicMock()
     service.module_texts = None
@@ -215,6 +216,7 @@ def test_retrieve_modules_respects_top_k(tmp_path, monkeypatch):
 # module_to_embedding_text
 # ------------------------------
 
+
 def test_module_to_embedding_text_contains_expected_fields(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     text = service.module_to_embedding_text(SAMPLE_MODULES[0])
@@ -234,6 +236,7 @@ def test_module_to_embedding_text_handles_missing_fields(tmp_path, monkeypatch):
 # ------------------------------
 # modules_to_string
 # ------------------------------
+
 
 def test_modules_to_string_returns_valid_json(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)

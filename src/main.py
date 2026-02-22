@@ -6,7 +6,6 @@ from rich import print
 from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
-from .memory import add_message, load_history
 from .services.registry.terraform_registry import ModuleRegistryService
 from .services.vector_store.faiss_store import FaissService
 

@@ -68,6 +68,7 @@ def test_run_sync_flag_calls_sync(monkeypatch):
 # chat
 # ------------------------------
 
+
 def _mock_registry(validate=True):
     registry = MagicMock()
     registry.validate_catalog.return_value = validate
@@ -83,7 +84,9 @@ def _mock_vector_store(reply="hi there"):
 
 def test_chat_exits_early_when_catalog_not_found(monkeypatch):
     output = []
-    monkeypatch.setattr(main, "get_registry_service", lambda: _mock_registry(validate=False))
+    monkeypatch.setattr(
+        main, "get_registry_service", lambda: _mock_registry(validate=False)
+    )
     monkeypatch.setattr(main, "print", lambda value: output.append(str(value)))
 
     main.chat()
@@ -145,6 +148,7 @@ def test_chat_sends_user_input_to_send_message(monkeypatch):
 # configure
 # ------------------------------
 
+
 def test_configure_uses_default_when_input_blank(monkeypatch):
     saved = {}
     output = []
@@ -195,7 +199,9 @@ def test_configure_falls_back_to_existing_config(monkeypatch):
     }
 
     monkeypatch.setattr(main, "load_config", lambda: existing)
-    monkeypatch.setattr(builtins, "input", lambda _prompt="": "")  # user hits enter on all
+    monkeypatch.setattr(
+        builtins, "input", lambda _prompt="": ""
+    )  # user hits enter on all
     monkeypatch.setattr(main, "save_config", lambda cfg: saved.update(cfg))
     monkeypatch.setattr(main, "get_config_file", lambda: "/tmp/.terragenairc")
     monkeypatch.setattr(main, "print", lambda value: None)

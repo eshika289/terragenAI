@@ -1,4 +1,3 @@
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -19,6 +18,7 @@ def _build_service(monkeypatch, api_key="test-key", dry_run="false"):
 # ------------------------------
 # __init__
 # ------------------------------
+
 
 def test_init_exits_when_no_api_key(monkeypatch):
     monkeypatch.setattr(
@@ -61,6 +61,7 @@ def test_init_dry_run_case_insensitive(monkeypatch):
 # create_embedding
 # ------------------------------
 
+
 def test_create_embedding_returns_none_when_dry_run(monkeypatch):
     service = _build_service(monkeypatch, dry_run="true")
     result = service.create_embedding("some text")
@@ -99,6 +100,7 @@ def test_create_embedding_returns_list_of_floats(monkeypatch):
 # ------------------------------
 # generate
 # ------------------------------
+
 
 def test_generate_returns_dry_run_value_when_dry_run(monkeypatch):
     service = _build_service(monkeypatch, dry_run="true")

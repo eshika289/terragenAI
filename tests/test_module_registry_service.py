@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 import requests
 
-from src.services.registry import base
+from src.services.registry import terraform_registry
 
 
 class FakeRegistry:
@@ -21,9 +21,9 @@ class FakeRegistry:
 
 
 def _build_service(tmp_path, monkeypatch):
-    monkeypatch.setattr(base, "ModuleRegistry", lambda: FakeRegistry())
-    monkeypatch.setattr(base, "get_config_dir", lambda: tmp_path)
-    return base.ModuleRegistryService()
+    monkeypatch.setattr(terraform_registry, "ModuleRegistry", lambda: FakeRegistry())
+    monkeypatch.setattr(terraform_registry, "get_config_dir", lambda: tmp_path)
+    return terraform_registry.ModuleRegistryService()
 
 
 # ------------------------------
@@ -63,9 +63,11 @@ def test_clone_url_injects_token_https(tmp_path, monkeypatch):
     class FakeRegistryWithToken(FakeRegistry):
         GIT_CLONE_TOKEN = "mytoken"
 
-    monkeypatch.setattr(base, "ModuleRegistry", lambda: FakeRegistryWithToken())
-    monkeypatch.setattr(base, "get_config_dir", lambda: tmp_path)
-    service = base.ModuleRegistryService()
+    monkeypatch.setattr(
+        terraform_registry, "ModuleRegistry", lambda: FakeRegistryWithToken()
+    )
+    monkeypatch.setattr(terraform_registry, "get_config_dir", lambda: tmp_path)
+    service = terraform_registry.ModuleRegistryService()
 
     result = service._clone_url("https://github.com/example/repo.git")
     assert result == "https://mytoken@github.com/example/repo.git"
@@ -75,9 +77,11 @@ def test_clone_url_injects_token_http(tmp_path, monkeypatch):
     class FakeRegistryWithToken(FakeRegistry):
         GIT_CLONE_TOKEN = "mytoken"
 
-    monkeypatch.setattr(base, "ModuleRegistry", lambda: FakeRegistryWithToken())
-    monkeypatch.setattr(base, "get_config_dir", lambda: tmp_path)
-    service = base.ModuleRegistryService()
+    monkeypatch.setattr(
+        terraform_registry, "ModuleRegistry", lambda: FakeRegistryWithToken()
+    )
+    monkeypatch.setattr(terraform_registry, "get_config_dir", lambda: tmp_path)
+    service = terraform_registry.ModuleRegistryService()
 
     result = service._clone_url("http://github.com/example/repo.git")
     assert result == "http://mytoken@github.com/example/repo.git"
@@ -339,7 +343,9 @@ def _mock_build_catalog_service(tmp_path, monkeypatch, modules):
     monkeypatch.setattr(service, "_git_checkout_tag", lambda _d, _t: None)
     monkeypatch.setattr(service, "_parse_tf_variables", lambda _d: [])
     monkeypatch.setattr(service, "_list_repo_files", lambda _d: [])
-    monkeypatch.setattr(base.shutil, "rmtree", lambda _p, ignore_errors=False: None)
+    monkeypatch.setattr(
+        terraform_registry.shutil, "rmtree", lambda _p, ignore_errors=False: None
+    )
     return service
 
 
@@ -438,7 +444,9 @@ def test_build_catalog_skips_version_when_tag_not_found(tmp_path, monkeypatch):
         "_git_checkout_tag",
         lambda _d, _t: (_ for _ in ()).throw(subprocess.CalledProcessError(1, "git")),
     )
-    monkeypatch.setattr(base.shutil, "rmtree", lambda _p, ignore_errors=False: None)
+    monkeypatch.setattr(
+        terraform_registry.shutil, "rmtree", lambda _p, ignore_errors=False: None
+    )
     service.build_catalog()
 
     with open(service.catalog_path, "r", encoding="utf-8") as f:
@@ -479,7 +487,9 @@ def test_build_catalog_continues_after_clone_failure(tmp_path, monkeypatch):
     monkeypatch.setattr(service, "_git_checkout_tag", lambda _d, _t: None)
     monkeypatch.setattr(service, "_parse_tf_variables", lambda _d: [])
     monkeypatch.setattr(service, "_list_repo_files", lambda _d: [])
-    monkeypatch.setattr(base.shutil, "rmtree", lambda _p, ignore_errors=False: None)
+    monkeypatch.setattr(
+        terraform_registry.shutil, "rmtree", lambda _p, ignore_errors=False: None
+    )
 
     service.build_catalog()
 

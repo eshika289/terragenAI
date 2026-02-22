@@ -7,7 +7,7 @@ from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
 from .memory import add_message, load_history
-from .services.registry.base import ModuleRegistryService
+from .services.registry.terraform_registry import ModuleRegistryService
 
 
 def chat() -> None:

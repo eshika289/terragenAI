@@ -296,3 +296,35 @@ class ModuleRegistryService:
     def validate_catalog(self):
         p = Path(self.catalog_path)
         return p.is_file() and p.stat().st_size > 0
+
+    # ------------------------------
+    # Pull Catalog
+    # ------------------------------
+    def pull_catalog(self) -> list[dict]:
+        with open(self.catalog_path, "r") as f:
+            raw_catalog = json.load(f)
+            return self._normalize_catalog(raw_catalog)
+
+    def _normalize_catalog(self, raw_catalog: dict) -> list[dict]:
+        """Pick latest version per module and normalize structure."""
+        inventory: list[dict] = []
+
+        for repo_url, versions in raw_catalog.items():
+            latest_version = sorted(versions.keys())[-1]
+            module = versions[latest_version]
+
+            inventory.append(
+                {
+                    "repo": repo_url,
+                    "version": latest_version,
+                    "module_name": module["module_name"],
+                    "namespace": module["namespace"],
+                    "provider": module["provider"],
+                    "source": module["source"],
+                    "variables": module.get("variables", []),
+                    "vcs_link": module.get("vcs_link", "N/A"),
+                    # "files": module.get("files", []),
+                }
+            )
+
+        return inventory

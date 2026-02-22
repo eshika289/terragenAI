@@ -8,3 +8,4 @@ terragenai.egg-info/
 htmlcov
 .ruff_cache
 src/_version.py
+personal-docs.md

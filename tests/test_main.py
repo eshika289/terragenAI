@@ -1,5 +1,6 @@
 import argparse
 import builtins
+from unittest.mock import MagicMock
 
 from src import main
 
@@ -49,36 +50,100 @@ def test_run_configure_flag_calls_configure(monkeypatch):
     assert called["configure"] == 1
 
 
-def test_chat_round_trip(monkeypatch):
-    prompts = iter(["hello", "exit"])
-    history_store = []
-    output = []
+def test_run_sync_flag_calls_sync(monkeypatch):
+    monkeypatch.setattr(main.sys, "argv", ["terragenai", "--sync"])
+    called = {"sync": 0}
+    monkeypatch.setattr(
+        main,
+        "sync_registry_modules",
+        lambda: called.__setitem__("sync", called["sync"] + 1),
+    )
 
-    monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
-    monkeypatch.setattr(
-        main,
-        "get_registry_service",
-        lambda: type("S", (), {"validate_catalog": lambda self: True})(),
-    )
-    monkeypatch.setattr(main, "load_history", lambda: history_store)
-    monkeypatch.setattr(main, "send_message", lambda _history: "hi there")
-    monkeypatch.setattr(
-        main,
-        "add_message",
-        lambda history, role, content: history.append(
-            {"role": role, "content": content}
-        ),
-    )
-    monkeypatch.setattr(main, "print", lambda value: output.append(value))
+    main.run()
+
+    assert called["sync"] == 1
+
+
+# ------------------------------
+# chat
+# ------------------------------
+
+def _mock_registry(validate=True):
+    registry = MagicMock()
+    registry.validate_catalog.return_value = validate
+    registry.pull_catalog.return_value = []
+    return registry
+
+
+def _mock_vector_store(reply="hi there"):
+    vector_store = MagicMock()
+    vector_store.create_index.return_value = None
+    return vector_store
+
+
+def test_chat_exits_early_when_catalog_not_found(monkeypatch):
+    output = []
+    monkeypatch.setattr(main, "get_registry_service", lambda: _mock_registry(validate=False))
+    monkeypatch.setattr(main, "print", lambda value: output.append(str(value)))
 
     main.chat()
 
-    assert history_store == [
-        {"role": "user", "content": "hello"},
-        {"role": "assistant", "content": "hi there"},
-    ]
-    assert any("TerragenAI Chat started" in str(line) for line in output)
+    assert any("sync" in line.lower() or "not found" in line.lower() for line in output)
 
+
+def test_chat_round_trip(monkeypatch):
+    prompts = iter(["hello", "exit"])
+    output = []
+
+    mock_registry = _mock_registry(validate=True)
+    mock_vector_store = MagicMock()
+    mock_vector_store.create_index.return_value = None
+
+    monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
+    monkeypatch.setattr(main, "get_registry_service", lambda: mock_registry)
+    monkeypatch.setattr(main, "FaissService", lambda catalog: mock_vector_store)
+    monkeypatch.setattr(main, "send_message", lambda prompt, vs: "hi there")
+    monkeypatch.setattr(main, "print", lambda value: output.append(str(value)))
+
+    main.chat()
+
+    assert any("TerragenAI Chat started" in line for line in output)
+    assert any("hi there" in line for line in output)
+
+
+def test_chat_loop_exits_on_quit(monkeypatch):
+    prompts = iter(["quit"])
+    monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
+    monkeypatch.setattr(main, "get_registry_service", lambda: _mock_registry())
+    monkeypatch.setattr(main, "FaissService", lambda catalog: _mock_vector_store())
+    monkeypatch.setattr(main, "send_message", lambda prompt, vs: "reply")
+    monkeypatch.setattr(main, "print", lambda value: None)
+
+    main.chat()  # should not raise StopIteration
+
+
+def test_chat_sends_user_input_to_send_message(monkeypatch):
+    prompts = iter(["create a vpc", "exit"])
+    received_prompts = []
+
+    monkeypatch.setattr(builtins, "input", lambda _prompt="": next(prompts))
+    monkeypatch.setattr(main, "get_registry_service", lambda: _mock_registry())
+    monkeypatch.setattr(main, "FaissService", lambda catalog: _mock_vector_store())
+    monkeypatch.setattr(
+        main,
+        "send_message",
+        lambda prompt, vs: received_prompts.append(prompt) or "reply",
+    )
+    monkeypatch.setattr(main, "print", lambda value: None)
+
+    main.chat()
+
+    assert received_prompts == ["create a vpc"]
+
+
+# ------------------------------
+# configure
+# ------------------------------
 
 def test_configure_uses_default_when_input_blank(monkeypatch):
     saved = {}
@@ -88,7 +153,7 @@ def test_configure_uses_default_when_input_blank(monkeypatch):
     monkeypatch.setattr(builtins, "input", lambda _prompt="": "")
     monkeypatch.setattr(main, "save_config", lambda cfg: saved.update(cfg))
     monkeypatch.setattr(main, "get_config_file", lambda: "/tmp/.terragenairc")
-    monkeypatch.setattr(main, "print", lambda value: output.append(value))
+    monkeypatch.setattr(main, "print", lambda value: output.append(str(value)))
 
     main.configure()
 
@@ -97,5 +162,46 @@ def test_configure_uses_default_when_input_blank(monkeypatch):
         "TF_REGISTRY_DOMAIN": "app.terraform.io",
         "TF_API_TOKEN": "",
         "GIT_CLONE_TOKEN": "",
+        "OPENAI_API_KEY": "",
     }
-    assert any("Saved configuration" in str(line) for line in output)
+    assert any("Saved configuration" in line for line in output)
+
+
+def test_configure_uses_provided_input(monkeypatch):
+    saved = {}
+    inputs = iter(["my-org", "app.terraform.io", "tf-token", "git-token", "openai-key"])
+
+    monkeypatch.setattr(main, "load_config", lambda: {})
+    monkeypatch.setattr(builtins, "input", lambda _prompt="": next(inputs))
+    monkeypatch.setattr(main, "save_config", lambda cfg: saved.update(cfg))
+    monkeypatch.setattr(main, "get_config_file", lambda: "/tmp/.terragenairc")
+    monkeypatch.setattr(main, "print", lambda value: None)
+
+    main.configure()
+
+    assert saved["TF_ORG"] == "my-org"
+    assert saved["TF_API_TOKEN"] == "tf-token"
+    assert saved["OPENAI_API_KEY"] == "openai-key"
+
+
+def test_configure_falls_back_to_existing_config(monkeypatch):
+    saved = {}
+    existing = {
+        "TF_ORG": "existing-org",
+        "TF_REGISTRY_DOMAIN": "app.terraform.io",
+        "TF_API_TOKEN": "existing-token",
+        "GIT_CLONE_TOKEN": "",
+        "OPENAI_API_KEY": "existing-key",
+    }
+
+    monkeypatch.setattr(main, "load_config", lambda: existing)
+    monkeypatch.setattr(builtins, "input", lambda _prompt="": "")  # user hits enter on all
+    monkeypatch.setattr(main, "save_config", lambda cfg: saved.update(cfg))
+    monkeypatch.setattr(main, "get_config_file", lambda: "/tmp/.terragenairc")
+    monkeypatch.setattr(main, "print", lambda value: None)
+
+    main.configure()
+
+    assert saved["TF_ORG"] == "existing-org"
+    assert saved["TF_API_TOKEN"] == "existing-token"
+    assert saved["OPENAI_API_KEY"] == "existing-key"

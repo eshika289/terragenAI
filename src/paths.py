@@ -37,13 +37,13 @@ def get_state_dir() -> Path:
         return _expand(override)
 
     if sys.platform == "darwin":
-        return Path.home() / APP_DIR_NAME
+        return Path.home() / "Library" / "Application Support" / APP_DIR_NAME
 
     if os.name == "nt":
-        appdata = os.getenv("APPDATA")
-        if appdata:
-            return Path(appdata) / APP_DIR_NAME
-        return Path.home() / "AppData" / "Roaming" / APP_DIR_NAME
+        localappdata = os.getenv("LOCALAPPDATA")
+        if localappdata:
+            return Path(localappdata) / APP_DIR_NAME
+        return Path.home() / "AppData" / "Local" / APP_DIR_NAME
 
     xdg_state = os.getenv("XDG_STATE_HOME")
     if xdg_state:

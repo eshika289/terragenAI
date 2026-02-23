@@ -7,10 +7,12 @@ from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
 from .services.registry.terraform_registry import ModuleRegistryService
+from .services.session.session import SessionService
 from .services.vector_store.faiss_store import FaissService
 
 
 def chat() -> None:
+    session_service = SessionService()
     registry_service = get_registry_service()
     if not registry_service.validate_catalog():
         print(
@@ -18,7 +20,7 @@ def chat() -> None:
         )
         return
 
-    # history = load_history()
+    history = session_service.load_session()
 
     catalog = registry_service.pull_catalog()
     vector_store = FaissService(catalog)
@@ -30,11 +32,13 @@ def chat() -> None:
         if user_input.lower() in ["exit", "quit"]:
             break
 
-        # add_message(history, "user", user_input)
+        session_service.add_message(history, "user", user_input)
         print("[yellow]Thinking...[/yellow]")
-        response = send_message(user_input, vector_store)
+        response = send_message(user_input, history, vector_store)
         print(f"\n[bold blue]Assistant:[/bold blue] {response}")
-        # add_message(history, "assistant", response)
+        session_service.add_message(history, "assistant", str(response))
+
+    session_service.clear_session()
 
 
 def configure() -> None:

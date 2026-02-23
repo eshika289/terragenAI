@@ -6,8 +6,8 @@ from rich import print
 from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
-from .memory import add_message, load_history
-from .services.registry.base import ModuleRegistryService
+from .services.registry.terraform_registry import ModuleRegistryService
+from .services.vector_store.faiss_store import FaissService
 
 
 def chat() -> None:
@@ -18,7 +18,11 @@ def chat() -> None:
         )
         return
 
-    history = load_history()
+    # history = load_history()
+
+    catalog = registry_service.pull_catalog()
+    vector_store = FaissService(catalog)
+    vector_store.create_index()
     print("[bold green]TerragenAI Chat started. Type 'exit' to quit.[/bold green]")
 
     while True:
@@ -26,11 +30,11 @@ def chat() -> None:
         if user_input.lower() in ["exit", "quit"]:
             break
 
-        add_message(history, "user", user_input)
+        # add_message(history, "user", user_input)
         print("[yellow]Thinking...[/yellow]")
-        response = send_message(history)
+        response = send_message(user_input, vector_store)
         print(f"\n[bold blue]Assistant:[/bold blue] {response}")
-        add_message(history, "assistant", response)
+        # add_message(history, "assistant", response)
 
 
 def configure() -> None:
@@ -52,11 +56,15 @@ def configure() -> None:
     git_clone_token = input(
         f"Enter GIT_CLONE_TOKEN [{current.get('GIT_CLONE_TOKEN', '')}]: "
     ).strip() or current.get("GIT_CLONE_TOKEN", "")
+    openai_api_key = input(
+        f"Enter OPENAI_API_KEY [{current.get('OPENAI_API_KEY', '')}]: "
+    ).strip() or current.get("OPENAI_API_KEY", "")
     config = {
         "TF_ORG": tf_org,
         "TF_REGISTRY_DOMAIN": tf_registry_domain,
         "TF_API_TOKEN": tf_api_token,
         "GIT_CLONE_TOKEN": git_clone_token,
+        "OPENAI_API_KEY": openai_api_key,
     }
     save_config(config)
     print("[bold green]Saved configuration.[/bold green]")
@@ -64,6 +72,7 @@ def configure() -> None:
     print(f"TF_REGISTRY_DOMAIN: {tf_registry_domain}")
     print(f"TF_API_TOKEN: {'(set)' if tf_api_token else '(not set)'}")
     print(f"GIT_CLONE_TOKEN: {'(set)' if git_clone_token else '(not set)'}")
+    print(f"OPENAI_API_KEY: {'(set)' if openai_api_key else '(not set)'}")
     print(f"Config file: {get_config_file()}")
 
 

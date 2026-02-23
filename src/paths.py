@@ -37,18 +37,18 @@ def get_state_dir() -> Path:
         return _expand(override)
 
     if sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / APP_DIR_NAME
+        return Path.home() / APP_DIR_NAME
 
     if os.name == "nt":
-        local_appdata = os.getenv("LOCALAPPDATA")
-        if local_appdata:
-            return Path(local_appdata) / APP_DIR_NAME
-        return Path.home() / "AppData" / "Local" / APP_DIR_NAME
+        appdata = os.getenv("APPDATA")
+        if appdata:
+            return Path(appdata) / APP_DIR_NAME
+        return Path.home() / "AppData" / "Roaming" / APP_DIR_NAME
 
     xdg_state = os.getenv("XDG_STATE_HOME")
     if xdg_state:
         return Path(xdg_state) / "terragenai"
-    return Path.home() / ".local" / "state" / "terragenai"
+    return Path.home() / ".local" / "session" / "terragenai"
 
 
 def ensure_dir(path: Path) -> Path:

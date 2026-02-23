@@ -43,7 +43,7 @@ TerragenAI Chat started. Type 'exit' to quit.
 You: create 2 ec2 instances in us-west-2
 Thinking...
 
-A: 
+Assistant: 
 
   module "ec2" {
     source         = "app.terraform.io/my-org/ec2-module/aws"

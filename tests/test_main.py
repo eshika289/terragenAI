@@ -60,6 +60,7 @@ def test_run_sync_flag_calls_sync(monkeypatch):
 # chat
 # ------------------------------
 
+
 def _mock_registry(validate=True):
     registry = MagicMock()
     registry.validate_catalog.return_value = validate
@@ -82,7 +83,9 @@ def _mock_session():
 def test_chat_exits_early_when_catalog_not_found(monkeypatch):
     output = []
     monkeypatch.setattr(main, "SessionService", lambda: _mock_session())
-    monkeypatch.setattr(main, "get_registry_service", lambda: _mock_registry(validate=False))
+    monkeypatch.setattr(
+        main, "get_registry_service", lambda: _mock_registry(validate=False)
+    )
     monkeypatch.setattr(main, "print", lambda value: output.append(str(value)))
     main.chat()
     assert any("sync" in line.lower() or "not found" in line.lower() for line in output)
@@ -161,6 +164,7 @@ def test_chat_adds_user_and_assistant_messages_to_session(monkeypatch):
 # ------------------------------
 # configure
 # ------------------------------
+
 
 def test_configure_uses_default_when_input_blank(monkeypatch):
     saved = {}

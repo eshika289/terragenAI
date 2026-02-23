@@ -7,8 +7,9 @@ from . import __version__
 from .client import send_message
 from .config import get_config_file, load_config, save_config
 from .services.registry.terraform_registry import ModuleRegistryService
-from .services.vector_store.faiss_store import FaissService
 from .services.session.session import SessionService
+from .services.vector_store.faiss_store import FaissService
+
 
 def chat() -> None:
     session_service = SessionService()
@@ -36,7 +37,7 @@ def chat() -> None:
         response = send_message(user_input, history, vector_store)
         print(f"\n[bold blue]Assistant:[/bold blue] {response}")
         session_service.add_message(history, "assistant", str(response))
-    
+
     session_service.clear_session()
 
 

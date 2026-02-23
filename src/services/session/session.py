@@ -1,21 +1,20 @@
 import json
 import os
-from pathlib import Path
 import uuid
 
 from ...paths import ensure_dir, get_state_dir
 
-class SessionService():
+
+class SessionService:
     def __init__(self):
         self.session_file = get_state_dir() / f"session_{uuid.uuid4()}.json"
         self.MAX_HISTORY = 10
-
 
     def load_session(self) -> list[dict]:
         if self.session_file.exists():
             with open(self.session_file, "r", encoding="utf-8") as f:
                 session = json.load(f)
-                return session[-self.MAX_HISTORY:]
+                return session[-self.MAX_HISTORY :]
         return []
 
     def save_session(self, session: list[dict]) -> None:
@@ -31,4 +30,3 @@ class SessionService():
         ensure_dir(self.session_file.parent)
         if self.session_file.exists():
             os.remove(self.session_file)
-

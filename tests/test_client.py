@@ -19,6 +19,7 @@ SAMPLE_HISTORY = [{"role": "user", "content": "create a vpc"}]
 # send_message
 # ------------------------------
 
+
 def test_send_message_returns_llm_reply():
     vector_store = _mock_vector_store(reply="some terraform code")
     result = client.send_message("create a vpc", SAMPLE_HISTORY, vector_store)
@@ -68,8 +69,7 @@ def test_send_message_includes_user_prompt_in_messages():
 
     messages = vector_store.llm.generate.call_args[0][0]
     assert any(
-        m["role"] == "user" and m["content"] == "create an s3 bucket"
-        for m in messages
+        m["role"] == "user" and m["content"] == "create an s3 bucket" for m in messages
     )
 
 

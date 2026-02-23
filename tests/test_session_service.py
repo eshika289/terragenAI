@@ -1,19 +1,14 @@
 import json
 import uuid
-from pathlib import Path
-from unittest.mock import patch
-
-import pytest
 
 from src.services.session.session import SessionService
 
 
 def _build_service(tmp_path, monkeypatch):
+    monkeypatch.setattr("src.services.session.session.get_state_dir", lambda: tmp_path)
     monkeypatch.setattr(
-        "src.services.session.session.get_state_dir", lambda: tmp_path
-    )
-    monkeypatch.setattr(
-        "src.services.session.session.ensure_dir", lambda p: p.mkdir(parents=True, exist_ok=True)
+        "src.services.session.session.ensure_dir",
+        lambda p: p.mkdir(parents=True, exist_ok=True),
     )
     return SessionService()
 
@@ -21,6 +16,7 @@ def _build_service(tmp_path, monkeypatch):
 # ------------------------------
 # __init__
 # ------------------------------
+
 
 def test_init_creates_unique_session_file_per_instance(tmp_path, monkeypatch):
     service_a = _build_service(tmp_path, monkeypatch)
@@ -45,6 +41,7 @@ def test_init_max_history_is_10(tmp_path, monkeypatch):
 # ------------------------------
 # load_session
 # ------------------------------
+
 
 def test_load_session_returns_empty_list_when_file_missing(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -101,6 +98,7 @@ def test_load_session_returns_empty_for_empty_file_content(tmp_path, monkeypatch
 # save_session
 # ------------------------------
 
+
 def test_save_session_writes_to_disk(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
     messages = [{"role": "user", "content": "hello"}]
@@ -126,6 +124,7 @@ def test_save_session_overwrites_existing(tmp_path, monkeypatch):
 # ------------------------------
 # add_message
 # ------------------------------
+
 
 def test_add_message_appends_to_session(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)
@@ -166,6 +165,7 @@ def test_add_message_correct_role_and_content(tmp_path, monkeypatch):
 # ------------------------------
 # clear_session
 # ------------------------------
+
 
 def test_clear_session_deletes_file(tmp_path, monkeypatch):
     service = _build_service(tmp_path, monkeypatch)

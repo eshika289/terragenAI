@@ -16,7 +16,7 @@ class OpenAIService(LLMService):
             print("[bold red]Error: No OpenAI API key found[/bold red]")
             exit(1)
         self.client = OpenAI(api_key=OPENAI_API_KEY)
-        self.dry_run = os.getenv("DRY_RUN").lower() == "true"
+        self.dry_run = os.getenv("DRY_RUN", "").lower() == "true"
 
     def create_embedding(self, text: str) -> list[float]:
         if self.dry_run:

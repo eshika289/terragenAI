@@ -1,23 +1,9 @@
 from .services.vector_store.faiss_store import FaissService
 
 
-def send_message(user_prompt: str, vector_store: FaissService) -> str:
-    # user_prompt = ""
-    # for message in reversed(history):
-    #     if message.get("role") == "user":
-    #         user_prompt = message.get("content", "")
-    #         break
-
-    # # Initialize conversation
-    # if session_id not in state.conversations:
-    #     state.conversations[session_id] = []
-
-    # # Append user message
-    # state.conversations[session_id].append({"role": "user", "content": user_prompt})
-
-    # # Keep only last MAX_HISTORY messages
-    # history = state.conversations[session_id][-state.MAX_HISTORY :]
-    history = [{"role": "user", "content": user_prompt}]
+def send_message(
+    user_prompt: str, history: list[dict], vector_store: FaissService
+) -> str:
 
     # Retrieve relevant modules - RAG
     retrieved_modules = vector_store.retrieve_modules(user_prompt)
@@ -45,15 +31,9 @@ Example: # Citation: <vcs_link>
 
     messages = [{"role": "system", "content": system_prompt}] + history
 
-    # logger.info("Full prompt sent to OpenAI: %s", messages)
-
     try:
         reply = vector_store.llm.generate(messages)
     except Exception as e:
-        # logger.exception("❌ OpenAI request failed")
         reply = f"⚠ Error generating Terraform: {e}"
-
-    # Append assistant message
-    # state.conversations[session_id].append({"role": "assistant", "content": reply})
 
     return reply

@@ -50,6 +50,12 @@ python -m src.main --configure
 python -m src.main
 ```
 
+## 6) Run linter and autoformater
+```bash
+python -m black .
+python -m ruff check . --fix   
+```
+
 Optional environment variables:
 
 - `TERRAGENAI_CONFIG_FILE` (override config file location)

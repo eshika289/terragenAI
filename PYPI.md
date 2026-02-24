@@ -18,6 +18,9 @@ Enter TF_API_TOKEN []:
 Enter GIT_CLONE_TOKEN []: 
 Enter OPENAI_API_KEY []: 
 Saved configuration.
+```
+
+```
 % terragenai --sync
 Fetching Terraform modules for org: my-org
 Found 12 module(s)

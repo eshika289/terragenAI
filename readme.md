@@ -7,19 +7,20 @@
 
 ## Features & How It Works
 
-**Terraform Cloud/Enterprise Module Catalog Builder** (`terragenai --sync`)
+**Terraform Cloud/Enterprise Private Module Registry Parser** (`terragenai --sync`)
 1. Fetches all modules from the TFC/TFE private registry API with pagination
 2. Clones each module repo via Git — VCS-agnostic, compatible with GitHub, GitLab, and Bitbucket
 3. Parses all `.tf` files using `python-hcl2` to extract variable metadata (name, type, default, required)
 4. Embeds each module using a configurable embedding model and builds a local FAISS `IndexFlatL2` index
 5. Persists the module catalog (`modules.json`) and FAISS index to disk
+6. To update local cache, run `terragenai --sync`
 
 **Conversational RAG-based Terraform AI Agent** (`terragenai`)
 1. User prompt is embedded and similarity-searched against the FAISS index
 2. Top-k most relevant modules are injected into the LLM system prompt as structured inventory
 3. The configured LLM generates HCL constrained to the provided modules only
 4. Every response includes a citation comment with the VCS link of each module used
-5. If no relevant module exists for a request, the model explicitly says so rather than generating arbitrary resources
+5. If no relevant module exists for a request, the model is explicitly instructed to say so rather than hallucinating responses
 6. Chat history is persisted per session, capped at 10 messages sent to the LLM
 
 
@@ -41,7 +42,7 @@
 
 terragenai runs entirely on your local machine. No module metadata, infrastructure context, or chat history is sent to any third-party service other than the configured LLM API endpoint.
 
-The LLM endpoint is fully configurable, allowing organisations to point the tool at any compatible API — including self-hosted or privately hosted models, or any other provider that meets internal security and compliance requirements. The vector index and module catalog are stored locally on disk and never leave the machine.
+The LLM endpoint is fully configurable, allowing organizations to point the tool at any compatible API — including self-hosted or privately hosted models, or any other provider that meets internal security and compliance requirements. The vector index and module catalog are stored locally on disk and never leave the machine.
 
 ## Tech Stack
 
@@ -73,6 +74,8 @@ Enter TF_API_TOKEN []:
 Enter GIT_CLONE_TOKEN []: 
 Enter LLM_API_KEY []: 
 Saved configuration.
+```
+```
 % terragenai --sync
 Fetching Terraform modules for org: my-org
 Found 12 module(s)
@@ -95,7 +98,7 @@ TerragenAI Chat started. Type 'exit' to quit.
 You: create 2 ec2 instances in us-west-2
 Thinking...
 
-A: 
+Assistant: 
 
   module ec2 {
     source         = app.terraform.io/my-org/ec2-module/aws
@@ -124,7 +127,7 @@ terragenai --sync
 
 | Variable | Description |
 |---|---|
-| `TF_ORG` | Your Terraform Cloud/Enterprise organisation name |
+| `TF_ORG` | Your Terraform Cloud/Enterprise organization name |
 | `TF_REGISTRY_DOMAIN` | Registry domain (default: app.terraform.io) |
 | `TF_API_TOKEN` | TFC/TFE API token |
 | `GIT_CLONE_TOKEN` | Git token for cloning private module repos |
